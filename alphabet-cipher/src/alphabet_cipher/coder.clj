@@ -10,17 +10,21 @@
 (def alphabet-keys
   (for [colum alphabet]
     (for [row alphabet]
-      (symbol (str (str colum) (str row))))))
+      (keyword (str colum row)))))
 
 (def rotated-alphabets
   (for [rotation (range (count alphabet))]
     (rotate-coll rotation alphabet)))
 
 (def encoding-map
-  (mapcat #(zipmap %1 %2) alphabet-keys rotated-alphabets))
+  (into {} (mapcat #(zipmap %1 %2) alphabet-keys rotated-alphabets)))
 
 (defn encode [keyword message]
-  "encodeme")
+  (let [colum-word (take (count message) (cycle (seq keyword)))]
+    (apply str
+           (map #(% encoding-map)
+                (map #(clojure.core/keyword (str %1 %2))
+                     (seq colum-word) (seq message))))))
 
 (defn decode [keyword message]
   "decodeme")
